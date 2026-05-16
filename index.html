@@ -113,14 +113,22 @@
             const loadingId = agregarMensajeUI('Analizando el corpus legal...', 'bot', true);
 
             try {
-               // 3. Enviar la pregunta al backend (Cloudflare Worker)
-const response = await fetch(BACKEND_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ pregunta: texto })
-});
-const data = await response.json();
-const respuestaIA = data.respuesta;
+              // 3. Enviar la pregunta al backend (Cloudflare Worker)
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pregunta: texto })
+                });
+                
+                const data = await response.json();
+                
+                // 🛡️ EL ESCUDO: Verificamos si el backend mandó un error
+                let respuestaIA;
+                if (data.error) {
+                    respuestaIA = `⚠️ <b>Error en el servidor:</b> ${data.error} <br><br> Por favor, revisa el backend.`;
+                } else {
+                    respuestaIA = data.respuesta;
+                }
 
                 // 4. Reemplazar el "escribiendo..." con la respuesta real
                 actualizarMensajeUI(loadingId, respuestaIA);
